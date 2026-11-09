@@ -1,8 +1,9 @@
+import { elemento } from "./dom";
 import { partidas } from "./dados";
 
 console.log(partidas);
 
-const lista = document.getElementById("lista-partidas");
+const lista = elemento("lista-partidas");
 
 for (const partida of partidas) {
 
