@@ -1,9 +1,14 @@
 import { elemento } from "./dom";
 import { partidas } from "./dados";
+import type { Modalidade, NovaPartida } from "./tipos";
+import { adicionarPartida } from "./servicos";
 
 console.log(partidas);
 
 const lista = elemento("lista-partidas");
+
+function desenhar(): void {
+    lista?.replaceChildren();
 
 for (const partida of partidas) {
 
@@ -11,6 +16,9 @@ for (const partida of partidas) {
     card.className = "card-partida";
     if (partida.status === "finalizada") {
     card.classList.add("finalizada");}
+
+    if (partida.status === "em andamento") {
+    card.classList.add("em-andamento"); }
 
     const modalidadeTexto = document.createElement("h2");
     modalidadeTexto.textContent = partida.modalidade;
@@ -32,6 +40,7 @@ for (const partida of partidas) {
     lista?.appendChild(card);
 }
 
+
 const totalElemento = document.getElementById("total-partidas");
 
 if (totalElemento) {
@@ -51,3 +60,37 @@ const pendentesElemento = document.getElementById("partidas-pendentes");
 if (pendentesElemento) {
     pendentesElemento.textContent = String(pendentes);
 }
+}
+
+const formulario = document.getElementById("formulario");
+
+formulario?.addEventListener("submit", (evento) => {
+    evento.preventDefault();
+
+    const time1 = document.getElementById("time1") as HTMLInputElement;
+    const time2 = document.getElementById("time2") as HTMLInputElement;
+    const data = document.getElementById("data") as HTMLInputElement;
+    const modalidade = document.getElementById("modalidade") as HTMLSelectElement;
+
+    console.log(time1.value);
+    console.log(time2.value);
+    console.log(data.value);
+    console.log(modalidade.value);
+
+    const dados: NovaPartida = {
+    modalidade: modalidade.value as Modalidade,
+    times: [time1.value.trim(), time2.value.trim()],
+    data: new Date(data.value)
+};
+try {
+    adicionarPartida(partidas, dados);
+    desenhar();
+
+    elemento("erro").textContent = "";
+} catch (erro) {
+    if (erro instanceof Error) {
+        elemento("erro").textContent = erro.message;
+    }
+}
+});
+desenhar();

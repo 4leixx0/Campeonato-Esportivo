@@ -18,6 +18,34 @@
             <p>Partidas pendentes: <span id="partidas-pendentes"></span></p>
         </section>
 
+        <section>
+    <h2 style="text-align: center;">Cadastrar partida</h2>
+
+    <form id="formulario" style="text-align: center;">
+        <label for="modalidade">Modalidade:</label>
+        <select id="modalidade" required>
+            <option value="futebol">Futebol</option>
+            <option value="futsal">Futsal</option>
+            <option value="basquete">Basquete</option>
+            <option value="volei">Vôlei</option>
+        </select>
+
+        <label for="time1">Primeiro time:</label>
+        <input id="time1" type="text" required minlength="3">
+
+        <label for="time2">Segundo time:</label>
+        <input id="time2" type="text" required minlength="3">
+
+        <label for="data">Data da partida:</label>
+        <input id="data" type="datetime-local" required>
+
+        <button type="submit">Cadastrar</button>
+
+<p id="erro" role="alert"></p>
+</form>
+<br> <br> <br> 
+</section>
+
     <main id="lista-partidas"></main>
 
     <script type="module" src="/src/main.ts"></script>

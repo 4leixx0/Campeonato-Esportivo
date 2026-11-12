@@ -28,3 +28,16 @@ body {
     background-color: #dcfce7;
     border-color: #16a34a;
 }
+
+.card-partida.em-andamento {
+    background-color: #fef9c3;
+    border-color: #eab308;
+}
+
+#erro {
+    color: #dc2626;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 12px;
+}
