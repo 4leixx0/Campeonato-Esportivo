@@ -1,7 +1,10 @@
 import { elemento } from "./dom";
-import { partidas } from "./dados";
+import { listarPartidas } from "./api";
+import type { Partida } from "./tipos";
 import type { Modalidade, NovaPartida } from "./tipos";
 import { adicionarPartida } from "./servicos";
+
+let partidas: Partida[] = [];
 
 console.log(partidas);
 
@@ -93,4 +96,14 @@ try {
     }
 }
 });
-desenhar();
+async function iniciar(): Promise<void> {
+    try {
+        partidas = await listarPartidas();
+        desenhar();
+    } catch (erro) {
+        console.error("Erro ao carregar partidas:", erro);
+        elemento("erro").textContent = "Não foi possível carregar as partidas.";
+    }
+}
+
+iniciar();
