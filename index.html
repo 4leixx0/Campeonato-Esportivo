@@ -18,6 +18,32 @@
             <p>Partidas pendentes: <span id="partidas-pendentes"></span></p>
         </section>
 
+<section id="area-autenticacao">
+    <h2>Acessar Campeonato Esportivo</h2>
+
+    <form id="form-login">
+        <h3>Entrar</h3>
+        <input id="login-email" type="email" placeholder="E-mail" required>
+        <input id="login-senha" type="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <form id="form-cadastro">
+        <h3>Criar conta</h3>
+        <input id="cadastro-nome" type="text" placeholder="Nome" required>
+        <input id="cadastro-email" type="email" placeholder="E-mail" required>
+        <input id="cadastro-senha" type="password" placeholder="Senha" minlength="8" required>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <p id="erro-auth" role="alert"></p>
+</section>
+
+<section id="area-usuario" hidden>
+    <p>Bem-vindo, <strong id="nome-usuario"></strong>!</p>
+    <button id="botao-sair" type="button">Sair</button>
+</section>
+
         <section>
     <h2 style="text-align: center;">Cadastrar partida</h2>
 

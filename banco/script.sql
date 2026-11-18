@@ -122,7 +122,8 @@ CREATE TABLE `usuarios` (
   `nome` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
+ALTER TABLE usuarios
+ADD COLUMN senha_hash VARCHAR(255) NULL;
 --
 -- Despejando dados para a tabela `usuarios`
 --

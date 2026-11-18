@@ -3,6 +3,8 @@ import { listarPartidas } from "./api";
 import type { Partida } from "./tipos";
 import type { Modalidade, NovaPartida } from "./tipos";
 import { adicionarPartida } from "./servicos";
+import { fazerLogin, cadastrarUsuario, criarPartida,alterarStatus,excluirPartida } from "./api";
+import { salvarToken, obterToken, sair } from "./auth";
 
 let partidas: Partida[] = [];
 
@@ -22,6 +24,45 @@ for (const partida of partidas) {
 
     if (partida.status === "em andamento") {
     card.classList.add("em-andamento"); }
+
+    const botaoStatus = document.createElement("button");
+
+botaoStatus.textContent =
+    partida.status === "finalizada" ? "Reabrir" : "Finalizar";
+
+botaoStatus.addEventListener("click", async () => {
+    const novoStatus =
+        partida.status === "finalizada" ? "agendada" : "finalizada";
+
+    try {
+        await alterarStatus(partida.id, novoStatus);
+        partidas = await listarPartidas();
+        desenhar();
+    } catch (erro) {
+        alert(erro instanceof Error ? erro.message : "Erro ao alterar status.");
+    }
+});
+
+card.appendChild(botaoStatus);
+
+const botaoExcluir = document.createElement("button");
+botaoExcluir.textContent = "Excluir";
+
+botaoExcluir.addEventListener("click", async () => {
+    if (!confirm("Deseja realmente excluir esta partida?")) {
+        return;
+    }
+
+    try {
+        await excluirPartida(partida.id);
+        partidas = await listarPartidas();
+        desenhar();
+    } catch (erro) {
+        alert(erro instanceof Error ? erro.message : "Erro ao excluir.");
+    }
+});
+
+card.appendChild(botaoExcluir);
 
     const modalidadeTexto = document.createElement("h2");
     modalidadeTexto.textContent = partida.modalidade;
@@ -67,7 +108,7 @@ if (pendentesElemento) {
 
 const formulario = document.getElementById("formulario");
 
-formulario?.addEventListener("submit", (evento) => {
+formulario?.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
     const time1 = document.getElementById("time1") as HTMLInputElement;
@@ -86,8 +127,9 @@ formulario?.addEventListener("submit", (evento) => {
     data: new Date(data.value)
 };
 try {
-    adicionarPartida(partidas, dados);
-    desenhar();
+    await criarPartida(dados);
+partidas = await listarPartidas();
+desenhar();
 
     elemento("erro").textContent = "";
 } catch (erro) {
@@ -96,13 +138,88 @@ try {
     }
 }
 });
+
+function atualizarTela(logado: boolean): void {
+    const areaAuth = elemento("area-autenticacao");
+    const areaUsuario = elemento("area-usuario");
+
+    areaAuth.hidden = logado;
+    areaUsuario.hidden = !logado;
+
+    const formularioPartida = elemento("formulario");
+    formularioPartida.hidden = !logado;
+
+    if (!logado) {
+        partidas = [];
+        desenhar();
+    }
+}
+
+elemento("form-login").addEventListener("submit", async (evento) => {
+    evento.preventDefault();
+
+    const email = (elemento("login-email") as HTMLInputElement).value;
+    const senha = (elemento("login-senha") as HTMLInputElement).value;
+
+    try {
+        const resposta = await fazerLogin(email, senha);
+
+        salvarToken(resposta.token);
+
+        elemento("nome-usuario").textContent = resposta.usuario.nome;
+        elemento("erro-auth").textContent = "";
+
+        partidas = await listarPartidas();
+        atualizarTela(true);
+        desenhar();
+
+    } catch (erro) {
+        elemento("erro-auth").textContent =
+            erro instanceof Error ? erro.message : "Erro ao entrar.";
+    }
+});
+
+elemento("botao-sair").addEventListener("click", () => {
+    sair();
+    elemento("nome-usuario").textContent = "";
+    atualizarTela(false);
+});
+
+elemento("form-cadastro").addEventListener("submit", async (evento) => {
+    evento.preventDefault();
+
+    const nome = (elemento("cadastro-nome") as HTMLInputElement).value;
+    const email = (elemento("cadastro-email") as HTMLInputElement).value;
+    const senha = (elemento("cadastro-senha") as HTMLInputElement).value;
+
+    try {
+        await cadastrarUsuario(nome, email, senha);
+
+        elemento("erro-auth").textContent =
+            "Conta criada com sucesso! Agora faça login.";
+
+        (elemento("form-cadastro") as HTMLFormElement).reset();
+
+    } catch (erro) {
+        elemento("erro-auth").textContent =
+            erro instanceof Error ? erro.message : "Erro ao cadastrar.";
+    }
+});
+
 async function iniciar(): Promise<void> {
+    atualizarTela(false);
+
+    if (!obterToken()) {
+        return;
+    }
+
     try {
         partidas = await listarPartidas();
         desenhar();
-    } catch (erro) {
-        console.error("Erro ao carregar partidas:", erro);
-        elemento("erro").textContent = "Não foi possível carregar as partidas.";
+        atualizarTela(true);
+    } catch {
+        sair();
+        atualizarTela(false);
     }
 }
 
